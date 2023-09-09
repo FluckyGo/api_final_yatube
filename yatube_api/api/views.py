@@ -129,13 +129,13 @@ class FollowViewSet(viewsets.ModelViewSet):
 
         following_user = get_object_or_404(User, username=following_username)
 
-        if serializer.is_valid():
-            if following_user == self.request.user:
-                raise exceptions.ValidationError("You cannot follow yourself.")
+        if following_user == self.request.user:
+            raise exceptions.ValidationError("You cannot follow yourself.")
 
-            if Follow.objects.filter(user=self.request.user,
-                                     following=following_user).exists():
-                raise exceptions.ValidationError(
-                    "You are already following this user.")
+        if Follow.objects.filter(user=self.request.user,
+                                 following=following_user).exists():
+            raise exceptions.ValidationError(
+                "You are already following this user."
+            )
 
-            serializer.save(user=self.request.user, following=following_user)
+        serializer.save(user=self.request.user, following=following_user)
