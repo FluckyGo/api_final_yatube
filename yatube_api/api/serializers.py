@@ -1,7 +1,6 @@
 import base64
 
 from rest_framework import serializers
-from rest_framework.relations import SlugRelatedField
 
 from django.core.files.base import ContentFile
 
@@ -44,10 +43,15 @@ class CommentSerializer(serializers.ModelSerializer):
 
 class FollowSerializer(serializers.ModelSerializer):
     user = serializers.SlugRelatedField(
-        slug_field='username', queryset=User.objects.all())
+        slug_field='username',
+        queryset=User.objects.all(),
+        default=serializers.CurrentUserDefault()
+    )
+
     following = serializers.SlugRelatedField(
         slug_field='username',
-        queryset=User.objects.all())
+        queryset=User.objects.all(),
+    )
 
     class Meta:
         model = Follow

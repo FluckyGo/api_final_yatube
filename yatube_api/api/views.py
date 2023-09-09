@@ -2,18 +2,15 @@ from rest_framework import viewsets, permissions
 from rest_framework import pagination
 from rest_framework import filters
 from rest_framework import exceptions
+from rest_framework import status
+from rest_framework.response import Response
+from django_filters.rest_framework import DjangoFilterBackend
+
+from django.shortcuts import get_object_or_404
 
 from posts.models import Post, Comment, Follow, Group, User
 from .serializers import (PostSerializer, CommentSerializer,
                           FollowSerializer, GroupSerializer)
-
-
-from rest_framework.response import Response
-from rest_framework import status
-from django_filters.rest_framework import DjangoFilterBackend
-import django_filters
-
-from django.shortcuts import get_object_or_404
 
 
 class GroupViewSet(viewsets.ReadOnlyModelViewSet):
@@ -117,7 +114,7 @@ class FollowViewSet(viewsets.ModelViewSet):
     serializer_class = FollowSerializer
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
     filterset_fields = ('user', 'following')
-    search_fields = ('user', 'following')
+    search_fields = ('user__username', 'following__username')
 
     def get_queryset(self):
         user = get_object_or_404(User, username=self.request.user.username)
@@ -125,13 +122,20 @@ class FollowViewSet(viewsets.ModelViewSet):
         # return Follow.objects.filter(user=self.request.user)
 
     def perform_create(self, serializer):
-        following_user = get_object_or_404(
-            User, username=self.request.data['following']
-        )
-        if following_user == self.request.user:
-            raise exceptions.ValidationError("You cannot follow yourself.")
-        if Follow.objects.filter(user=self.request.user,
-                                 following=following_user).exists():
-            raise exceptions.ValidationError(
-                "You are already following this user.")
-        serializer.save(user=self.request.user, following=following_user)
+        following_username = self.request.data.get('following')
+
+        if not following_username:
+            raise exceptions.ValidationError("Following field is required.")
+
+        following_user = get_object_or_404(User, username=following_username)
+
+        if serializer.is_valid():
+            if following_user == self.request.user:
+                raise exceptions.ValidationError("You cannot follow yourself.")
+
+            if Follow.objects.filter(user=self.request.user,
+                                     following=following_user).exists():
+                raise exceptions.ValidationError(
+                    "You are already following this user.")
+
+            serializer.save(user=self.request.user, following=following_user)
