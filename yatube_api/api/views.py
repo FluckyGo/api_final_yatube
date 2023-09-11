@@ -1,14 +1,13 @@
 from rest_framework import viewsets, permissions, mixins
 from rest_framework import pagination
 from rest_framework import filters
-from rest_framework import exceptions
 from rest_framework import status
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 
 from django.shortcuts import get_object_or_404
 
-from posts.models import Post, Comment, Follow, Group, User
+from posts.models import Post, Comment, Group, User
 from .serializers import (PostSerializer, CommentSerializer,
                           FollowSerializer, GroupSerializer)
 
