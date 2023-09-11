@@ -1,7 +1,5 @@
-from rest_framework import viewsets, permissions, mixins
-from rest_framework import pagination
-from rest_framework import filters
-from rest_framework import status
+from rest_framework import (viewsets, permissions, mixins,
+                            pagination, filters, status, exceptions)
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 
