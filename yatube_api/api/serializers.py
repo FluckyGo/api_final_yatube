@@ -1,6 +1,6 @@
 import base64
 
-from rest_framework import serializers
+from rest_framework import serializers, validators
 
 from django.core.files.base import ContentFile
 
@@ -53,6 +53,21 @@ class FollowSerializer(serializers.ModelSerializer):
         queryset=User.objects.all(),
     )
 
+    def validate(self, data):
+
+        if data['user'] == data['following']:
+            raise serializers.ValidationError(
+                "You cannot follow yourself."
+            )
+        return data
+
     class Meta:
         model = Follow
         fields = ('user', 'following')
+
+        validators = [
+            validators.UniqueTogetherValidator(
+                queryset=Follow.objects.all(),
+                fields=['user', 'following']
+            )
+        ]
