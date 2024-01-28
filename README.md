@@ -1,3 +1,14 @@
+# API_Final - законченная версия API для yatube.
+
+#### Технологии
+
+- Python
+- Django 
+- Django Rest Framework
+- Djoser 
+- Simple JWT
+- SQLite3
+
 ### Как запустить проект:
 
 Клонировать репозиторий:
